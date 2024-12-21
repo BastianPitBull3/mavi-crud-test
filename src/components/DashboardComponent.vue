@@ -3,7 +3,7 @@
     <!-- Navbar -->
     <nav class="navbar">
       <ul>
-        <li><router-link to="/dashboard">Agregar Cliente</router-link></li>
+        <li><router-link to="/dashboard" @click="goToDashboard">Agregar Cliente</router-link></li>
         <li><router-link to="/clients">Ver Clientes</router-link></li>
       </ul>
     </nav>
@@ -44,27 +44,27 @@ import axios from "axios";
 export default {
   data() {
     return {
-      clients: [],
-      client: {
+      clients: [],  // Lista de clientes
+      client: {  // Datos del cliente
         firstName: "",
         lastName: "",
         motherLastName: "",
         address: "",
         email: "",
       },
-      isEdit: false,
-      token: localStorage.getItem("token") || "", // Obtén el token desde localStorage
+      isEdit: false,  // Bandera para verificar si estamos en modo edición
+      token: localStorage.getItem("token") || "", // Token JWT desde localStorage
     };
   },
   methods: {
-
+    // Método para obtener un cliente por su ID
     async fetchClient(clientId) {
       try {
         const response = await axios.get(`http://localhost:3000/api/clients/${clientId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.client = response.data;
-        this.isEdit = true;
+        this.isEdit = true;  // Establecer el estado de edición
       } catch (error) {
         console.error("Error obteniendo el cliente:", error);
         if (error.response && error.response.status === 403) {
@@ -73,6 +73,7 @@ export default {
       }
     },
 
+    // Método para crear un nuevo cliente
     async createClient() {
       try {
         const response = await axios.post(
@@ -80,13 +81,14 @@ export default {
           this.client,
           { headers: { Authorization: `Bearer ${this.token}` } }
         );
-        this.clients.push(response.data);
-        this.clearForm();
+        this.clients.push(response.data);  // Agregar cliente creado a la lista
+        this.clearForm();  // Limpiar formulario después de crear
       } catch (error) {
         console.error("Error creando cliente:", error);
       }
     },
 
+    // Método para actualizar un cliente existente
     async updateClient() {
       try {
         const response = await axios.put(
@@ -95,21 +97,23 @@ export default {
           { headers: { Authorization: `Bearer ${this.token}` } }
         );
         const index = this.clients.findIndex((c) => c.id === this.client.id);
-        this.clients[index] = response.data;
-        this.clearForm();
+        this.clients[index] = response.data;  // Actualizar cliente en la lista
+        this.clearForm();  // Limpiar formulario después de actualizar
       } catch (error) {
         console.error("Error actualizando cliente:", error);
       }
     },
 
+    // Método para manejar el envío del formulario (crear o actualizar cliente)
     handleSubmit() {
       if (this.isEdit) {
-        this.updateClient(); // Si estamos en modo edición, actualizamos el cliente
+        this.updateClient();  // Actualizar cliente si estamos en modo edición
       } else {
-        this.createClient(); // Si no, creamos un nuevo cliente
+        this.createClient();  // Crear cliente si no estamos en modo edición
       }
     },
 
+    // Método para limpiar el formulario
     clearForm() {
       this.client = {
         firstName: "",
@@ -118,36 +122,42 @@ export default {
         address: "",
         email: "",
       };
-      this.isEdit = false; // Limpiamos el formulario y volvemos a crear cliente
+      this.isEdit = false;  // Resetear la bandera de edición
     },
 
+    // Método para preparar el formulario en modo edición
     editClient(client) {
-      this.client = { ...client }; // Copiamos los datos del cliente seleccionado
-      this.isEdit = true; // Establecemos que estamos en modo edición
+      this.client = { ...client };  // Copiar los datos del cliente
+      this.isEdit = true;  // Establecer el estado de edición
     },
 
+    // Método para eliminar un cliente
     async deleteClient(clientId) {
       try {
         await axios.delete(`http://localhost:3000/api/clients/${clientId}`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.clients = this.clients.filter((client) => client.id !== clientId);
+        this.clients = this.clients.filter((client) => client.id !== clientId);  // Filtrar el cliente eliminado
       } catch (error) {
         console.error("Error eliminando cliente:", error);
       }
     },
 
+    // Método para redirigir al Dashboard y limpiar el formulario
     goToDashboard() {
-      this.$router.push("/dashboard"); // Navegar al dashboard sin cliente para crear uno nuevo
+      this.clearForm();  // Limpiar el formulario al redirigir
+      this.$router.push("/dashboard");  // Navegar al dashboard
     },
   },
   mounted() {
-  if (this.$route.query.isEdit === 'true') {
-    const clientId = this.$route.query.clientId;
-    if (clientId) {
-      this.fetchClient(clientId);  // Método para obtener el cliente por ID
+    this.clearForm();  // Limpiar el formulario al montar el componente
+    if (this.$route.query.isEdit === 'true') {
+      const clientId = this.$route.query.clientId;
+      if (clientId) {
+        this.fetchClient(clientId);  // Obtener el cliente por su ID si estamos en modo edición
+      }
     }
-  }},
+  },
 };
 </script>
 

@@ -9,7 +9,7 @@
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" v-model="password" value="password123"  id="password" required />
+          <input type="password" v-model="password" value="password123" id="password" required />
         </div>
         <button type="submit" class="btn-primary">Login</button>
       </form>
@@ -131,3 +131,4 @@ input:focus {
   transform: scale(0.98);
 }
 </style>
+

@@ -41,11 +41,12 @@ import axios from "axios";
 export default {
   data() {
     return {
-      clients: [], // Lista de clientes
-      token: localStorage.getItem("token") || "", // Token JWT desde localStorage
+      clients: [], // Lista de clientes obtenida desde la API
+      token: localStorage.getItem("token") || "", // Token JWT almacenado en localStorage
     };
   },
   methods: {
+    // Método para obtener la lista de clientes
     async fetchClients() {
       try {
         const response = await axios.get("http://localhost:3000/api/clients", {
@@ -56,30 +57,34 @@ export default {
         console.error("Error al obtener clientes:", error);
       }
     },
+
+    // Método para editar un cliente y redirigir al formulario de edición
     editClient(client) {
-      // Navegar al dashboard con el cliente seleccionado y el flag isEdit=true
       this.$router.push({
         path: '/dashboard',
-        query: { isEdit: 'true', clientId: client.id },  // Pasar el ID del cliente
+        query: { isEdit: 'true', clientId: client.id }, // Pasar ID del cliente como parámetro
       });
     },
+
+    // Método para eliminar un cliente
     async deleteClient(clientId) {
       try {
         await axios.delete(`http://localhost:3000/api/clients/${clientId}`, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
-        this.clients = this.clients.filter((client) => client.id !== clientId);
-        console.log("Cliente eliminado:", clientId);
+        this.clients = this.clients.filter((client) => client.id !== clientId); // Filtrar cliente eliminado
       } catch (error) {
         console.error("Error al eliminar cliente:", error);
       }
     },
+
+    // Método para redirigir al Dashboard
     goToDashboard() {
-      this.$router.push("/dashboard"); // Navegar al dashboard sin cliente para crear uno nuevo
+      this.$router.push("/dashboard"); // Redirige al dashboard
     },
   },
   mounted() {
-    this.fetchClients(); // Obtener clientes al montar la vista
+    this.fetchClients(); // Llamar al método para obtener clientes cuando el componente se monte
   },
 };
 </script>
@@ -101,7 +106,7 @@ h2 {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  min-width: 900px; /* Tamaño mínimo mayor */
+  min-width: 900px;
 }
 
 .clients-table th,
