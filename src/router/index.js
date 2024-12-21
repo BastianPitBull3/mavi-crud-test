@@ -1,23 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../components/LoginComponent.vue';
-import Dashboard from '../components/ClientsComponent.vue'; // Ejemplo de página de destino
+import Dashboard from '../components/DashboardComponent.vue'; // Página protegida
+import Clients from '../components/ClientsView.vue';
 
 const routes = [
-  { path: '/login', component: Login },
-  { path: '/dashboard', component: Dashboard },
+  { path: '/', component: Login },
+  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } },
+  { path: '/clients', component: Clients },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 
-// Añadir lógica para proteger rutas que requieren autenticación
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !localStorage.getItem('token')) {
-    next('/login'); // Redirigir al login si no hay token
+    next('/login'); // Redirige al login si no está autenticado
   } else {
-    next(); // Continuar si está autenticado o la ruta no requiere autenticación
+    next();
   }
 });
 
